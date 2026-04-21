@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection Login Lab</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #0f1117;
+            color: #e6edf3;
+        }
+
+        h1, h2, h3 {
+            color: #58a6ff;
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            background: #0d1117;
+            color: #e6edf3;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #238636;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #2ea043;
+        }
+
+        pre {
+            background: #010409;
+            border: 1px solid #30363d;
+            padding: 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .success {
+            color: #3fb950;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: #f85149;
+            font-weight: bold;
+        }
+
+        .muted {
+            color: #8b949e;
+        }
+
+        .attempt {
+            border-top: 1px solid #30363d;
+            padding-top: 14px;
+            margin-top: 14px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .explain-block {
+            margin-top: 12px;
+            padding: 12px;
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+        }
+
+        .explain-block p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <h1>SQL Injection Login Lab</h1>
+    <p class="muted">Try a normal login or a SQL injection payload.</p>
+
+    <div class="card">
+        <form method="post" action="/labs/sqli-login">
+            <label for="username">Username</label>
+            <input id="username" type="text" name="username" required>
+
+            <label for="password">Password</label>
+            <input id="password" type="text" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    {% if submitted %}
+    <div class="card">
+        <h2>Execution Trace</h2>
+        <p><strong>Username:</strong> {{ username }}</p>
+        <p><strong>Password/Payload:</strong> {{ password }}</p>
+        <p><strong>Vulnerability Type:</strong> {{ vulnerability_type }}</p>
+
+        <p><strong>Generated Query:</strong></p>
+        <pre>{{ query }}</pre>
+
+        {% if query_error %}
+            <p class="fail"><strong>SQL Error:</strong> {{ query_error }}</p>
+        {% else %}
+            <p>
+                <strong>Login Result:</strong>
+                {% if success %}
+                    <span class="success">Login successful</span>
+                {% else %}
+                    <span class="fail">Login failed</span>
+                {% endif %}
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Explanation</h2>
+        <h3>{{ explanation.title }}</h3>
+
+        <div class="explain-block">
+            <p><strong>What happened:</strong> {{ explanation.what_happened }}</p>
+            <p><strong>Why it worked/failed:</strong> {{ explanation.why_it_worked }}</p>
+            <p><strong>Impact:</strong> {{ explanation.impact }}</p>
+            <p><strong>Secure fix:</strong> {{ explanation.fix }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h2>Recent Attempts</h2>
+
+        {% if attempts %}
+            {% for attempt in attempts %}
+            <div class="attempt">
+                <p><strong>ID:</strong> {{ attempt.id }}</p>
+                <p><strong>Time:</strong> {{ attempt.created_at }}</p>
+                <p><strong>Username:</strong> {{ attempt.username_input }}</p>
+                <p><strong>Password/Payload:</strong> {{ attempt.password_input }}</p>
+                <p><strong>Vulnerability Type:</strong> {{ attempt.vulnerability_type }}</p>
+                <p>
+                    <strong>Success:</strong>
+                    {% if attempt.success %}
+                        <span class="success">True</span>
+                    {% else %}
+                        <span class="fail">False</span>
+                    {% endif %}
+                </p>
+                <p><strong>Generated Query:</strong></p>
+                <pre>{{ attempt.generated_query }}</pre>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="muted">No attempts saved yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
